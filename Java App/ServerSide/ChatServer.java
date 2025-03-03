@@ -1,7 +1,9 @@
 // Handles client connections and coordinates database and broadcasting operations.
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
+import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -21,26 +23,39 @@ public class ChatServer {
 
     // Start the server
     public void start() {
-    	// Checks if the Database is reachable using a method from "MessageDatabase.java"
+        // Checks if the Database is reachable using a method from "MessageDatabase.java"
         if (!database.Connection()) return;
 
-        // Opening server listening on port 9999 as specified in "Main.java"
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server is running on port " + port);
-            
-            // Waiting for connections
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                new Thread(() -> handleClient(clientSocket)).start();
+        try {
+            // Load the keystore containing the server certificate
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(new FileInputStream("server.keystore"), "password".toCharArray());
+
+            // Initialize the key manager factory with the keystore
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+            keyManagerFactory.init(keyStore, "password".toCharArray());
+
+            // Initialize the SSL context
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+
+            // Create SSLServerSocketFactory
+            SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+            try (SSLServerSocket serverSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port)) {
+                System.out.println("SSL Server is running on port " + port);
+
+                while (true) {
+                    SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
+                    new Thread(() -> handleClient(clientSocket)).start();
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Server error: " + e.getMessage());
         }
     }
 
-    
     private void handleClient(Socket clientSocket) {
-    	// Increment of the userId in the Database for every connection
+        // Increment of the userId in the Database for every connection
         int userId = nextUserId++;
         
         // Read client inputs and send messages back
@@ -48,7 +63,7 @@ public class ChatServer {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
         ) {
-        	
+            
             broadcaster.addClient(out);
             database.sendChatHistory(out);
 
