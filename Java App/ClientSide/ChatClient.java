@@ -3,6 +3,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ChatClient {
+
     private final String serverAddress;
     private final int serverPort;
 
@@ -43,8 +44,8 @@ public class ChatClient {
     }
 
     public static void main(String[] args) {
-        String serverAddress = "localhost"; // Change if the server is on a different address
-        int serverPort = 9999; // Ensure this matches the server port
+        String serverAddress = "localhost"; // Server Address
+        int serverPort = 9999; // Server Port
         ChatClient client = new ChatClient(serverAddress, serverPort);
         client.start();
     }
