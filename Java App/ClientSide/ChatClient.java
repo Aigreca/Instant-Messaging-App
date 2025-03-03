@@ -17,15 +17,23 @@ public class ChatClient {
         try {
             // Load the keystore containing the client certificate
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("client.keystore"), "password".toCharArray());
+            keyStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/client.keystore"), "password".toCharArray());
 
             // Initialize the key manager factory with the keystore
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
             keyManagerFactory.init(keyStore, "password".toCharArray());
 
+            // Load the truststore containing the server certificate
+            KeyStore trustStore = KeyStore.getInstance("JKS");
+            trustStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/client.truststore"), "password".toCharArray());
+
+            // Initialize the trust manager factory with the truststore
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+            trustManagerFactory.init(trustStore);
+
             // Initialize the SSL context
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
             // Create SSLSocketFactory
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();

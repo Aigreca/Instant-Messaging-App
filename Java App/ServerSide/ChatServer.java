@@ -29,7 +29,7 @@ public class ChatServer {
         try {
             // Load the keystore containing the server certificate
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("server.keystore"), "password".toCharArray());
+            keyStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/server.keystore"), "password".toCharArray());
 
             // Initialize the key manager factory with the keystore
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
