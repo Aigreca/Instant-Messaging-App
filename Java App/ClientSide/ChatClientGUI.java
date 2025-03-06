@@ -59,8 +59,7 @@ public class ChatClientGUI extends JFrame {
                 String serverAddress = serverAddressField.getText();
                 int serverPort = Integer.parseInt(serverPortField.getText());
                 String username = usernameField.getText();
-                ChatClient client = new ChatClient(serverAddress, serverPort, username);
-                client.start();
+                new ChatInterfaceGUI(serverAddress, serverPort, username).setVisible(true);
                 dispose();
             }
         });

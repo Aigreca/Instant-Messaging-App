@@ -65,7 +65,7 @@ public class ChatServer {
         ) {
             
             broadcaster.addClient(out);
-            database.sendChatHistory(out);
+            database.sendChatHistory(out); // Send chat history to the client
 
             out.println("Enter your nickname:");
             String nickname = Optional.ofNullable(in.readLine()).orElse("User#" + userId);
