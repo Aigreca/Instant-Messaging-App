@@ -9,24 +9,49 @@ public class ChatClientGUI extends JFrame {
     private JTextField usernameField;
 
     public ChatClientGUI() {
-        setTitle("Chat Client");
-        setSize(300, 200);
+        setTitle("ALEAU");
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(4, 2));
-        panel.add(new JLabel("Server Address:"));
-        serverAddressField = new JTextField("localhost");
-        panel.add(serverAddressField);
+        // Set the water drop logo
+        ImageIcon logo = new ImageIcon("/home/walle/git/Instant-Messaging-App/Java App/water_drop.png");
+        setIconImage(logo.getImage());
 
-        panel.add(new JLabel("Server Port:"));
-        serverPortField = new JTextField("9999");
-        panel.add(serverPortField);
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(173, 216, 230)); // Set background color to pastel blue
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        panel.add(new JLabel("Username:"));
-        usernameField = new JTextField();
-        panel.add(usernameField);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(new JLabel("Server Address:"), gbc);
 
+        gbc.gridx = 1;
+        serverAddressField = new JTextField("localhost", 15);
+        panel.add(serverAddressField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(new JLabel("Server Port:"), gbc);
+
+        gbc.gridx = 1;
+        serverPortField = new JTextField("9999", 15);
+        panel.add(serverPortField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(new JLabel("Username:"), gbc);
+
+        gbc.gridx = 1;
+        usernameField = new JTextField(15);
+        panel.add(usernameField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         JButton connectButton = new JButton("Connect");
         connectButton.addActionListener(new ActionListener() {
             @Override
@@ -39,7 +64,7 @@ public class ChatClientGUI extends JFrame {
                 dispose();
             }
         });
-        panel.add(connectButton);
+        panel.add(connectButton, gbc);
 
         add(panel);
     }
