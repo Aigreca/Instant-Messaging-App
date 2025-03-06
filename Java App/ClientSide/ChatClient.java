@@ -7,10 +7,12 @@ public class ChatClient {
 
     private final String serverAddress;
     private final int serverPort;
+    private final String username;
 
-    public ChatClient(String serverAddress, int serverPort) {
+    public ChatClient(String serverAddress, int serverPort, String username) {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
+        this.username = username;
     }
 
     public void start() {
@@ -55,6 +57,8 @@ public class ChatClient {
                     }
                 }).start();
 
+                out.println(username); // Send username to the server
+
                 while (true) {
                     String message = scanner.nextLine();
                     out.println(message);
@@ -69,7 +73,7 @@ public class ChatClient {
     public static void main(String[] args) {
         String serverAddress = "localhost";
         int serverPort = 9999;
-        ChatClient client = new ChatClient(serverAddress, serverPort);
+        ChatClient client = new ChatClient(serverAddress, serverPort, "DefaultUser");
         client.start();
     }
 }
