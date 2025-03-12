@@ -1,12 +1,19 @@
 import java.io.PrintWriter;
 import java.sql.*;
 
+/**
+ * Classe représentant la base de données des messages.
+ */
 public class MessageDatabase {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/chatapp";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
 
-    // Connexion à la base de données
+    /**
+     * Connexion à la base de données.
+     * 
+     * @return true si la connexion est réussie, false sinon
+     */
     public boolean Connection() {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             System.out.println("Connected to the database successfully!");
@@ -17,7 +24,15 @@ public class MessageDatabase {
         }
     }
 
-    // Stocker les messages dans la base de données
+    /**
+     * Stocker les messages dans la base de données.
+     * 
+     * @param userId ID de l'utilisateur
+     * @param nickname Pseudo de l'utilisateur
+     * @param message Message à stocker
+     * @param timestamp Horodatage du message
+     * @return true si le message est stocké avec succès, false sinon
+     */
     public boolean storeMessage(int userId, String nickname, String message, String timestamp) {
         String sql = "INSERT INTO messages (user_id, nickname, message, timestamp) VALUES (?, ?, ?, ?)"; // Requête SQL
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD); // Connexion à la base de données
@@ -34,7 +49,11 @@ public class MessageDatabase {
         }
     }
 
-    // Envoyer l'historique des messages au client
+    /**
+     * Envoyer l'historique des messages au client.
+     * 
+     * @param out PrintWriter pour envoyer les messages au client
+     */
     public void sendChatHistory(PrintWriter out) {
         String sql = "SELECT user_id, nickname, message, timestamp FROM messages ORDER BY timestamp ASC"; // Requête SQL
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD); // Connexion à la base de données

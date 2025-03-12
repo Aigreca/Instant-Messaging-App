@@ -1,11 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Classe représentant l'interface graphique pour se connecter au serveur de chat.
+ */
 public class ChatClientGUI extends JFrame {
     private JTextField serverAddressField;
     private JTextField serverPortField;
     private JTextField usernameField;
 
+    /**
+     * Constructeur de la classe ChatClientGUI.
+     */
     public ChatClientGUI() {
         setTitle("ALEAU");
         setSize(400, 200);
@@ -63,6 +69,11 @@ public class ChatClientGUI extends JFrame {
         add(panel); // Ajouter le panneau à la fenêtre
     }
 
+    /**
+     * Méthode principale pour lancer l'interface graphique du client de chat.
+     * 
+     * @param args Arguments de la ligne de commande
+     */
     public static void main(String[] args) { 
         SwingUtilities.invokeLater(() -> new ChatClientGUI().setVisible(true)); // Créer une instance de l'interface graphique du client
     } 

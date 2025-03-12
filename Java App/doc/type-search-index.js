@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"<Unnamed>","l":"ChatClient"},{"p":"<Unnamed>","l":"ChatClientGUI"},{"p":"<Unnamed>","l":"ChatInterfaceGUI"},{"p":"<Unnamed>","l":"ChatServer"},{"p":"<Unnamed>","l":"Main"},{"p":"<Unnamed>","l":"MessageBroadcaster"},{"p":"<Unnamed>","l":"MessageDatabase"}]

@@ -6,11 +6,21 @@ import java.awt.*;
 import java.io.*;
 import java.security.KeyStore;
 
+/**
+ * Classe représentant l'interface graphique du client de chat.
+ */
 public class ChatInterfaceGUI extends JFrame { 
     private JTextArea chatArea; // Zone de texte pour afficher les messages
     private JTextField messageField; // Champ de texte pour saisir les messages
     private PrintWriter out; // Écriture des messages
 
+    /**
+     * Constructeur de la classe ChatInterfaceGUI.
+     * 
+     * @param serverAddress Adresse du serveur
+     * @param serverPort Port du serveur
+     * @param username Nom d'utilisateur
+     */
     public ChatInterfaceGUI(String serverAddress, int serverPort, String username) {
         setTitle("ALEAU"); // Titre de la fenêtre
         setSize(600, 500); // Taille de la fenêtre
@@ -53,7 +63,13 @@ public class ChatInterfaceGUI extends JFrame {
         connectToServer(serverAddress, serverPort, username); // Connexion au serveur
     }
 
-    // Connexion au serveur
+    /**
+     * Connexion au serveur.
+     * 
+     * @param serverAddress Adresse du serveur
+     * @param serverPort Port du serveur
+     * @param username Nom d'utilisateur
+     */
     private void connectToServer(String serverAddress, int serverPort, String username) {
         try {
             // Charger le keystore contenant le certificat client
@@ -101,13 +117,22 @@ public class ChatInterfaceGUI extends JFrame {
         }
     }
 
-    // Envoyer un message au serveur
+    /**
+     * Envoyer un message au serveur.
+     * 
+     * @param message Message à envoyer
+     */
     private void sendMessage(String message) { 
         if (out != null) { 
             out.println(message); 
         }
     }
 
+    /**
+     * Méthode principale pour lancer l'application.
+     * 
+     * @param args Arguments de la ligne de commande
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new ChatInterfaceGUI("localhost", 9999, "DefaultUser").setVisible(true));
     } // Créer une instance de l'interface graphique du client et l'afficher

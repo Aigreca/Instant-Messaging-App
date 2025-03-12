@@ -3,17 +3,30 @@ import java.io.*;
 import java.security.KeyStore;
 import java.util.Scanner;
 
+/**
+ * Classe représentant le client de chat.
+ */
 public class ChatClient {
     private final String serverAddress;
     private final int serverPort;
     private final String username;
 
+    /**
+     * Constructeur de la classe ChatClient.
+     * 
+     * @param serverAddress Adresse du serveur
+     * @param serverPort Port du serveur
+     * @param username Nom d'utilisateur
+     */
     public ChatClient(String serverAddress, int serverPort, String username) {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
         this.username = username;
     }
 
+    /**
+     * Démarrer le client de chat.
+     */
     public void start() {
         try {
             // Charger le keystore contenant le certificat client
@@ -69,6 +82,11 @@ public class ChatClient {
         }
     }
 
+    /**
+     * Méthode principale pour lancer le client de chat.
+     * 
+     * @param args Arguments de la ligne de commande
+     */
     public static void main(String[] args) { 
         String serverAddress = "localhost"; 
         int serverPort = 9999;

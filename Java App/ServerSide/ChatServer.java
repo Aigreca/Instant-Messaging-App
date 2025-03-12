@@ -5,19 +5,29 @@ import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Classe représentant le serveur de chat.
+ */
 public class ChatServer {
     private final int port;
     private final MessageDatabase database;
     private final MessageBroadcaster broadcaster;
     private static int nextUserId = 1;
 
+    /**
+     * Constructeur de la classe ChatServer.
+     * 
+     * @param port Port du serveur
+     */
     public ChatServer(int port) {
         this.port = port;
         this.database = new MessageDatabase();
         this.broadcaster = new MessageBroadcaster();
     }
 
-    // Démarrer le serveur
+    /**
+     * Démarrer le serveur.
+     */
     public void start() {
         if (!database.Connection()) return; // Vérifier la connexion à la base de données
 
@@ -49,7 +59,11 @@ public class ChatServer {
         }
     }
 
-    // Gérer la connexion d'un client
+    /**
+     * Gérer la connexion d'un client.
+     * 
+     * @param clientSocket Socket du client
+     */
     private void handleClient(Socket clientSocket) {
         int userId = nextUserId++; // Incrémenter l'ID utilisateur
 
