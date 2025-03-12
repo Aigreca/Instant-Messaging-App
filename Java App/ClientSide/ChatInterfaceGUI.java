@@ -1,108 +1,114 @@
 import javax.net.ssl.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.security.KeyStore;
 
-public class ChatInterfaceGUI extends JFrame {
-    private JTextArea chatArea;
-    private JTextField messageField;
-    private PrintWriter out;
+public class ChatInterfaceGUI extends JFrame { 
+    private JTextArea chatArea; // Zone de texte pour afficher les messages
+    private JTextField messageField; // Champ de texte pour saisir les messages
+    private PrintWriter out; // Écriture des messages
 
     public ChatInterfaceGUI(String serverAddress, int serverPort, String username) {
-        setTitle("Chat Interface");
-        setSize(500, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setTitle("ALEAU"); // Titre de la fenêtre
+        setSize(600, 500); // Taille de la fenêtre
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Fermer l'application lors de la fermeture de la fenêtre
+        setLocationRelativeTo(null); // Centrer la fenêtre
 
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
+        // Zone de texte pour afficher les messages
+        chatArea = new JTextArea(); // Zone de texte
+        chatArea.setEditable(false); // Désactiver l'édition
+        chatArea.setLineWrap(true); // Saut de ligne automatique
+        chatArea.setBorder(new LineBorder(Color.GRAY, 1, true)); // Bordures arrondies
         JScrollPane scrollPane = new JScrollPane(chatArea);
+        scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10)); // Ajouter des marges
+        scrollPane.setBackground(new Color(173, 216, 230)); // Couleur de fond bleu pastel
 
+        // Champ de texte pour saisir les messages
         messageField = new JTextField();
-        messageField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage(messageField.getText());
-                messageField.setText("");
-            }
+        messageField.setBorder(new LineBorder(Color.GRAY, 1, true)); // Bordures arrondies
+        messageField.addActionListener(e -> { // Envoyer le message en appuyant sur Entrée
+            sendMessage(messageField.getText());  // Zone de texte pour saisir les messages
         });
 
-        JButton sendButton = new JButton("Send");
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage(messageField.getText());
-                messageField.setText("");
-            }
+        // Bouton pour envoyer les messages
+        JButton sendButton = new JButton("Send"); // Bouton d'envoi
+        sendButton.addActionListener(e -> { // Envoyer le message en cliquant sur le bouton
+            sendMessage(messageField.getText()); // Envoyer le message
+            messageField.setText(""); // Effacer le champ de texte après l'envoi
         });
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(messageField, BorderLayout.CENTER);
-        panel.add(sendButton, BorderLayout.EAST);
+        // Panneau pour le champ de texte et le bouton
+        JPanel panel = new JPanel(new BorderLayout()); // Panneau avec un gestionnaire de disposition BorderLayout
+        panel.add(messageField, BorderLayout.CENTER); // Ajouter le champ de texte au centre
+        panel.add(sendButton, BorderLayout.EAST); // Ajouter le bouton à droite
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Ajouter des marges
+        panel.setBackground(new Color(173, 216, 230)); // Couleur de fond bleu pastel
 
-        add(scrollPane, BorderLayout.CENTER);
-        add(panel, BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.CENTER); // Ajouter la zone de texte au centre
+        add(panel, BorderLayout.SOUTH); // Ajouter le panneau avec le champ de texte et le bouton en bas
 
-        connectToServer(serverAddress, serverPort, username);
+        connectToServer(serverAddress, serverPort, username); // Connexion au serveur
     }
 
+    // Connexion au serveur
     private void connectToServer(String serverAddress, int serverPort, String username) {
         try {
-            // Load the keystore containing the client certificate
+            // Charger le keystore contenant le certificat client
             KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/client.keystore"), "password".toCharArray());
 
-            // Initialize the key manager factory with the keystore
+            // Initialiser le KeyManagerFactory avec le keystore
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
             keyManagerFactory.init(keyStore, "password".toCharArray());
 
-            // Load the truststore containing the server certificate
+            // Charger le truststore contenant le certificat serveur
             KeyStore trustStore = KeyStore.getInstance("JKS");
             trustStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/client.truststore"), "password".toCharArray());
 
-            // Initialize the trust manager factory with the truststore
+            // Initialiser le TrustManagerFactory avec le truststore
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
             trustManagerFactory.init(trustStore);
 
-            // Initialize the SSL context
+            // Initialiser le contexte SSL
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
-            // Create SSLSocketFactory
+            // Créer la socket SSL
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket(serverAddress, serverPort);
             out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            new Thread(() -> {
+            // Thread pour lire les messages du serveur
+            new Thread(() -> { 
                 try {
-                    String message;
-                    while ((message = in.readLine()) != null) {
-                        chatArea.append(message + "\n");
+                    String message; // Message reçu du serveur
+                    while ((message = in.readLine()) != null) { // Lire les messages du serveur
+                        chatArea.append(message + "\n"); // Ajouter le message à la zone de texte
+                        chatArea.setCaretPosition(chatArea.getDocument().getLength()); // Faire défiler vers le bas
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e) { 
+                    e.printStackTrace(); 
                 }
-            }).start();
+            }).start(); 
 
-            out.println(username); // Send username to the server
+            out.println(username); // Envoyer le nom d'utilisateur au serveur
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void sendMessage(String message) {
-        if (out != null) {
-            out.println(message);
+    // Envoyer un message au serveur
+    private void sendMessage(String message) { 
+        if (out != null) { 
+            out.println(message); 
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new ChatInterfaceGUI("localhost", 9999, "DefaultUser").setVisible(true);
-        });
-    }
+        SwingUtilities.invokeLater(() -> new ChatInterfaceGUI("localhost", 9999, "DefaultUser").setVisible(true));
+    } // Créer une instance de l'interface graphique du client et l'afficher
 }

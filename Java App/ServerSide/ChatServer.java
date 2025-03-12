@@ -1,5 +1,3 @@
-// Handles client connections and coordinates database and broadcasting operations.
-
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
@@ -8,38 +6,35 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ChatServer {
-
     private final int port;
     private final MessageDatabase database;
     private final MessageBroadcaster broadcaster;
     private static int nextUserId = 1;
 
-    // Initialization of MessageDatabase & MessageBroadcaster
     public ChatServer(int port) {
         this.port = port;
         this.database = new MessageDatabase();
         this.broadcaster = new MessageBroadcaster();
     }
 
-    // Start the server
+    // Démarrer le serveur
     public void start() {
-        // Checks if the Database is reachable using a method from "MessageDatabase.java"
-        if (!database.Connection()) return;
+        if (!database.Connection()) return; // Vérifier la connexion à la base de données
 
         try {
-            // Load the keystore containing the server certificate
+            // Charger le keystore contenant le certificat serveur
             KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(new FileInputStream("/home/walle/git/Instant-Messaging-App/Java App/server.keystore"), "password".toCharArray());
 
-            // Initialize the key manager factory with the keystore
+            // Initialiser le KeyManagerFactory avec le keystore
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
             keyManagerFactory.init(keyStore, "password".toCharArray());
 
-            // Initialize the SSL context
+            // Initialiser le contexte SSL
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
 
-            // Create SSLServerSocketFactory
+            // Créer la SSLServerSocketFactory
             SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
             try (SSLServerSocket serverSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port)) {
                 System.out.println("SSL Server is running on port " + port);
@@ -54,39 +49,36 @@ public class ChatServer {
         }
     }
 
+    // Gérer la connexion d'un client
     private void handleClient(Socket clientSocket) {
-        // Increment of the userId in the Database for every connection
-        int userId = nextUserId++;
-        
-        // Read client inputs and send messages back
-        try (
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
+        int userId = nextUserId++; // Incrémenter l'ID utilisateur
+
+        try ( 
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); // Lire les messages du client
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true) // Envoyer des messages au client
         ) {
-            
-            broadcaster.addClient(out);
-            database.sendChatHistory(out); // Send chat history to the client
+            broadcaster.addClient(out); // Ajouter le client à la liste des clients
+            database.sendChatHistory(out); // Envoyer l'historique des messages au client
 
-            out.println("Enter your nickname:");
-            String nickname = Optional.ofNullable(in.readLine()).orElse("User#" + userId);
-            out.println("Welcome, " + nickname + "!");
+            String nickname = Optional.ofNullable(in.readLine()).orElse("User#" + userId); // Lire le pseudo du client
+            out.println("Welcome, " + nickname + "!"); // Envoyer un message de bienvenue
 
-            String message;
-            while ((message = in.readLine()) != null) {
-                String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                if (database.storeMessage(userId, nickname, message, timestamp)) {
-                    broadcaster.broadcastMessage(userId, nickname, message, timestamp);
-                }
+            String message; // Message reçu du client
+            while ((message = in.readLine()) != null) { // Lire les messages du client
+                String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); // Horodatage du message
+                if (database.storeMessage(userId, nickname, message, timestamp)) { // Stocker le message dans la base de données
+                    broadcaster.broadcastMessage(userId, nickname, message, timestamp); // Diffuser le message à tous les clients
+                } 
             }
         } catch (IOException e) {
             System.err.println("Client error: " + e.getMessage());
-        } finally {
-            try {
-                broadcaster.removeClient(clientSocket);
-                clientSocket.close();
-            } catch (IOException e) {
-                System.err.println("Failed to close client socket.");
-            }
+        } finally { // Supprimer le client de la liste des clients
+            try { 
+                broadcaster.removeClient(clientSocket); 
+                clientSocket.close(); 
+            } catch (IOException e) { 
+                System.err.println("Failed to close client socket."); 
+            } 
         }
     }
 }

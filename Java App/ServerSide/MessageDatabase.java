@@ -2,13 +2,11 @@ import java.io.PrintWriter;
 import java.sql.*;
 
 public class MessageDatabase {
-	
-    // MySQL CONFIGURATION ----> Store the messages
     private static final String DB_URL = "jdbc:mysql://localhost:3306/chatapp";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
 
-    // Connection to the Database
+    // Connexion à la base de données
     public boolean Connection() {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             System.out.println("Connected to the database successfully!");
@@ -19,38 +17,38 @@ public class MessageDatabase {
         }
     }
 
-    // Storing the messages in the table
+    // Stocker les messages dans la base de données
     public boolean storeMessage(int userId, String nickname, String message, String timestamp) {
-        String sql = "INSERT INTO messages (user_id, nickname, message, timestamp) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            stmt.setString(2, nickname);
+        String sql = "INSERT INTO messages (user_id, nickname, message, timestamp) VALUES (?, ?, ?, ?)"; // Requête SQL
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD); // Connexion à la base de données
+             PreparedStatement stmt = connection.prepareStatement(sql)) { // Préparer la requête SQL
+            stmt.setInt(1, userId); 
+            stmt.setString(2, nickname); 
             stmt.setString(3, message);
-            stmt.setString(4, timestamp);
-            stmt.executeUpdate();
+            stmt.setString(4, timestamp); // 
+            stmt.executeUpdate(); // Exécuter la requête SQL
             return true;
-        } catch (SQLException e) {
+        } catch (SQLException e) { 
             System.err.println("Error storing message: " + e.getMessage());
             return false;
         }
     }
 
-    
+    // Envoyer l'historique des messages au client
     public void sendChatHistory(PrintWriter out) {
-        String sql = "SELECT user_id, nickname, message, timestamp FROM messages ORDER BY timestamp ASC";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            out.println("Chat History:");
-            while (rs.next()) {
-                out.printf("[%s] (User #%d) %s: %s%n",
-                        rs.getString("timestamp"),
-                        rs.getInt("user_id"),
-                        rs.getString("nickname"),
-                        rs.getString("message"));
+        String sql = "SELECT user_id, nickname, message, timestamp FROM messages ORDER BY timestamp ASC"; // Requête SQL
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD); // Connexion à la base de données
+             PreparedStatement stmt = connection.prepareStatement(sql); // Préparer la requête SQL
+             ResultSet rs = stmt.executeQuery()) { // Exécuter la requête SQL
+            out.println("Chat History:"); 
+            while (rs.next()) { 
+                out.printf("[%s] (User #%d) %s: %s%n", 
+                        rs.getString("timestamp"), 
+                        rs.getInt("user_id"), 
+                        rs.getString("nickname"), 
+                        rs.getString("message")); 
             }
-        } catch (SQLException e) {
+        } catch (SQLException e) { 
             System.err.println("Error retrieving chat history: " + e.getMessage());
         }
     }
